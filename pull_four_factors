@@ -1,0 +1,83 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
+import time
+import csv
+
+# Set up a webdriver instance using the Chrome browser
+driver = webdriver.Chrome()
+
+# Navigate to the staking page
+driver.get('https://www.nba.com/stats/teams/four-factors')
+
+# Wait for the page to load
+time.sleep(15)
+
+# Get the fully rendered HTML of the page
+html = driver.page_source
+
+# Parse the HTML of the staking page and extract the trusted answers
+soup = BeautifulSoup(html, 'html.parser')
+
+
+
+# Find the body element
+second_body_element = soup.find('body')
+
+# Check if the body element was found
+if second_body_element is not None:
+  # Find the div element with the data-reactroot attribute
+  div_element = second_body_element.find('div', attrs={'data-reactroot': ''})
+
+  # Check if the div element was found
+  if div_element is not None:
+    # Find the main element with the stakingLayout_container__WzwO_ class
+    main_element = div_element.find('div', class_="Layout_base__6IeUC Layout_withSubNav__ByKRF Layout_justNav__2H4H0")
+
+    # Check if the main element was found
+    if main_element is not None:
+      # Find the div element with the homeView_container__8zV5Z class
+      home_view_element = main_element.find('div', class_="Layout_mainContent__jXliI")
+
+      # Check if the home_view_element element was found
+      if home_view_element is not None:
+        # Find the div element with the dataFeedsSecured_container__SEadr class
+        data_feeds_secured_element = home_view_element.find('div', class_="MaxWidthContainer_mwc__ID5AG")
+
+        # Check if the data_feeds_secured_element element was found
+        if data_feeds_secured_element is not None:
+          # Find the div element with the nodeOperators_container__op_sL class
+          node_operators_element = data_feeds_secured_element.find('section', class_="Block_block__62M07 nba-stats-content-block")
+
+          if node_operators_element is not None:
+            next_level = node_operators_element.find('div', class_="Block_blockContent__6iJ_n")
+
+            # Check if the node_operators_element element was found
+            if next_level is not None:
+              # Find the table element
+              table_element = next_level.find('table')
+
+              # Check if the table_element element was found
+              if table_element is not None:
+                # Extract the table element into a list of dictionaries
+                table_data = []
+
+                # Find the thead element
+                thead_element = table_element.find('thead')
+
+                # Extract the column names from the th elements
+                column_names = [th.get_text().strip() for th in thead_element.find_all('th')]
+
+                # Find the tbody element
+                tbody_element = table_element.find('tbody')
+
+                # Iterate over the tr elements
+                for tr_element in tbody_element.find_all('tr'):
+                  # Extract the data from the td elements
+                  data = [td.get_text().strip() for td in tr_element.find_all('td')]
+
+                  # Create a dictionary with the column names as the keys and the data as the values
+                  row_data = dict(zip(column_names, data))
+
+                  # Append the dictionary to the list
+                  table_data.append(row_data)
