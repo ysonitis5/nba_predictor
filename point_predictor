@@ -1,5 +1,9 @@
 import pandas as pd
 from sklearn.linear_model import LinearRegression
+import warnings
+
+# Ignore the warning about invalid feature names
+warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
 # Load the data from the score.csv file
 df_score_home = pd.read_csv('score_home.csv')
