@@ -10,17 +10,12 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
 # Load the data
-df_home = pd.read_csv('ff_home.csv', encoding='latin1')
-df_away = pd.read_csv('ff_away.csv', encoding='latin1')
-
-
-df_home.rename(columns={'WIN%': 'Winning Percentage'}, inplace=True)
-df_away.rename(columns={'WIN%': 'Winning Percentage'}, inplace=True)
+df_home = pd.read_csv('home.csv', encoding='latin1')
+df_away = pd.read_csv('away.csv', encoding='latin1')
 
 # print(df_home.columns)
 # Concatenate the two DataFrames into a single DataFrame
 df = pd.concat([df_home, df_away])
-
 # Find rows that contain infinite values
 mask = df.isin([np.inf, -np.inf]).any(axis=1)
 
@@ -34,17 +29,18 @@ mask = df.isnull().any(axis=1)
 df = df[~mask]
 
 # Select the features and target
-X = df[['eFG%', 'TOV%', 'OREB%',
-       'OppeFG%', 'FTA', 'OppTOV%', 'OppOREB%', 'OffRtg', 'DefRtg', 'PACE']]
+X = df[['eFG%', 'FTA', 'TOV%', 'OREB%',
+       'OppeFG%', 'OFTA', 'OppTOV%', 'OppOREB%', 'OffRtg', 'DefRtg', 'PACE']]
 y = df['Winning Percentage']
+
 
 # Train the model
 model = LinearRegression()
 model.fit(X, y)
 
 
-team_a = 'Chicago Bulls'
-team_h = 'Boston Celtics'
+team_a = 'Dallas Mavericks'
+team_h = 'LA Clippers'
 
 
 h_points = pts.predict_home_points(team_h)
@@ -56,10 +52,10 @@ def predict_game(away_team, home_team, h_points, a_points):
     away_stats = df_away[df_away['Team'] == away_team]
 
     # Select the features for both teams
-    X_home = home_stats[['eFG%', 'TOV%', 'OREB%',
-       'OppeFG%', 'FTA', 'OppTOV%', 'OppOREB%', 'OffRtg', 'DefRtg', 'PACE']]
-    X_away = away_stats[['eFG%', 'TOV%', 'OREB%',
-       'OppeFG%', 'FTA', 'OppTOV%', 'OppOREB%', 'OffRtg', 'DefRtg', 'PACE']]
+    X_home = home_stats[['eFG%', 'FTA', 'TOV%', 'OREB%',
+       'OppeFG%', 'OFTA', 'OppTOV%', 'OppOREB%', 'OffRtg', 'DefRtg', 'PACE']]
+    X_away = away_stats[['eFG%', 'FTA', 'TOV%', 'OREB%',
+       'OppeFG%', 'OFTA', 'OppTOV%', 'OppOREB%', 'OffRtg', 'DefRtg', 'PACE']]
 
     # Use the model to make predictions for both teams
     home_prediction = model.predict(X_home)
@@ -86,8 +82,6 @@ def predict_game(away_team, home_team, h_points, a_points):
     else:
 
         return f"The {away_team} are more likely to win. By {point_spread_away}."
-
-
 
 
 result = predict_game(team_a, team_h, h_points, a_points)
