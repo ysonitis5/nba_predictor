@@ -57,14 +57,15 @@ def predict_away_points(team_name):
 
     return predicted_points
 
-team_a = 'Chicago Bulls'
-team_h = 'Boston Celtics'
+team_a = 'Cleveland Cavaliers'
+team_h = 'Portland Trail Blazers'
 
 home = predict_home_points(team_h)
 away = predict_away_points(team_a)
 
+total = home + away
 
 
-
+print(f'Total: {total}')
 print(f'{team_a}: {away}')
 print(f'{team_h}: {home}')
