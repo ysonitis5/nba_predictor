@@ -39,8 +39,8 @@ model = LinearRegression()
 model.fit(X, y)
 
 
-team_a = 'Dallas Mavericks'
-team_h = 'LA Clippers'
+team_a = 'Cleveland Cavaliers'
+team_h = 'Portland Trail Blazers'
 
 
 h_points = pts.predict_home_points(team_h)
