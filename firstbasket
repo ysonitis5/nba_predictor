@@ -1,0 +1,39 @@
+import pandas as pd
+import numpy as np
+
+df = pd.read_csv("data.csv")
+winning_players = df["Winning Player"]
+losing_players = df["Losing Player"]
+elos = {player: 1000 for player in set(winning_players) | set(losing_players)}
+
+K = 32
+
+loser_idx = -1  # Initialize loser_idx outside of the loop
+
+for _, row in df.iterrows():
+    winner = row["Winning Player"]
+    loser = row["Losing Player"]
+    winner_idx = np.where(winning_players == winner)[0][0]
+    if loser in winning_players:
+        loser_idx = np.where(winning_players == loser)[0][0]
+        losing_elo = elos[loser_idx]
+    else:
+        loser_idx = -1
+        losing_elo = 1000
+    winner_elo = elos[winner]
+    if loser_idx != -1:
+        loser_elo = elos[loser_idx]
+    else:
+        loser_elo = 1000
+    expected_win = 1 / (1 + 10 ** ((losing_elo - winner_elo) / 400))
+    actual_win = 1
+    winner_new_elo = round(winner_elo + K * (actual_win - expected_win))
+    if loser_idx != -1:
+        loser_new_elo = round(loser_elo + K * (expected_win - actual_win))
+        elos[loser] = loser_new_elo
+    elos[winner] = winner_new_elo
+
+elo_df = pd.DataFrame(list(elos.items()), columns=["Player", "ELO rating"])
+elo_df = elo_df.sort_values("ELO rating", ascending=False)
+elo_df["Rank"] = range(1, len(elo_df) + 1)
+elo_df.to_csv("ranking.csv", index=False)
